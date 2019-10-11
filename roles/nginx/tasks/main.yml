@@ -1,0 +1,64 @@
+- name: Update apt
+  apt:
+    upgrade: true
+    update_cache: true
+  become: true
+
+- name: Install nginx
+  apt:
+    name: "{{ nginx_deb_package_name }}"
+  become: true
+
+- name: Download bigchaindb nginx config.
+  get_url:
+    url: "{{ nginx_conf_net_loc }}"
+    dest: "{{ nginx_conf_loc }}"
+    mode: '0644'
+    force: true
+  become : true
+
+- name:  Install ssl requirements
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+       - python-cryptography
+  become: true
+
+- name: Create cert directory
+  file:
+    path:  /etc/nginx/ssl
+    state: directory
+  become: true
+
+- name: Generate an OpenSSL private key
+  openssl_privatekey:
+    path: /etc/nginx/ssl/cert.key
+    force: true
+  become: true
+
+- name: Generate an OpenSSL Certificate Signing Request
+  openssl_csr:
+    path: "/etc/nginx/ssl/{{ nginx_servername }}.csr"
+    privatekey_path: /etc/nginx/ssl/cert.key
+    country_name: DE
+    organization_name: BigchainDB
+    email_address: mail@mail.com
+    common_name: "{{ nginx_servername }}"
+    force: true
+  become: true
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: /etc/nginx/ssl/cert.pem
+    privatekey_path: /etc/nginx/ssl/cert.key
+    csr_path: "/etc/nginx/ssl/{{ nginx_servername }}.csr"
+    provider: selfsigned
+    force: true
+  become: true
+
+- name: Edit nginx.conf
+  shell: |
+    # TODO replace with regex
+    sed -i 's@server_name "example.testnet2.com";@server_name "{{ nginx_servername }}";@' {{ nginx_conf_loc }}
+  become: true

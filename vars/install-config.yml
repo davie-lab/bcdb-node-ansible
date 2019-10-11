@@ -18,11 +18,19 @@ go_deb_package_name: "golang"
 
 # Tendermint
 tendermint_repo: "github.com/tendermint/tendermint"
-tendermint_branch: "v0.31.5"
+tendermint_branch: "v0.31.5" # NOTE: use "v0.22.8" for bigchaindb v2.0.0b9
 
 # Bigchaindb
 bigchaindb_version: "v2.0.0"
 bigchaindb_log_folder: "/var/log"
+
+# Nginx
+nginx_enable: false
+nginx_deb_package_name: "nginx"
+nginx_conf_loc: "/etc/nginx/nginx.conf"
+nginx_conf_net_loc: "https://raw.githubusercontent.com/bigchaindb/bigchaindb/{{ bigchaindb_version }}/nginx/nginx.conf"
+nginx_servername: "server.name"
+nginx_selfsigned: true
 
 # etc
 use_trusted_ntp: true
