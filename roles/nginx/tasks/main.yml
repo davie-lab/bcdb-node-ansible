@@ -27,35 +27,20 @@
 
 - name: Create cert directory
   file:
-    path:  /etc/nginx/ssl
+    path: /etc/nginx/ssl
     state: directory
   become: true
 
-- name: Generate an OpenSSL private key
-  openssl_privatekey:
-    path: /etc/nginx/ssl/cert.key
-    force: true
-  become: true
 
-- name: Generate an OpenSSL Certificate Signing Request
-  openssl_csr:
-    path: "/etc/nginx/ssl/{{ nginx_servername }}.csr"
-    privatekey_path: /etc/nginx/ssl/cert.key
-    country_name: DE
-    organization_name: BigchainDB
-    email_address: mail@mail.com
-    common_name: "{{ nginx_servername }}"
-    force: true
-  become: true
+# NOTE `Populate ssl directory` and `Generate certificate` are mutually exclusive!
+- name: Generate certificate
+  include_tasks: generate-cert.yml
+  when: nginx_selfsigned
 
-- name: Generate a Self Signed OpenSSL certificate
-  openssl_certificate:
-    path: /etc/nginx/ssl/cert.pem
-    privatekey_path: /etc/nginx/ssl/cert.key
-    csr_path: "/etc/nginx/ssl/{{ nginx_servername }}.csr"
-    provider: selfsigned
-    force: true
-  become: true
+- name: Populate ssl directory
+  include_tasks: copy-cert.yml
+  when: nginx_copy_existing_certs
+
 
 - name: Edit nginx.conf
   shell: |

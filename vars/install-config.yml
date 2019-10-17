@@ -25,12 +25,14 @@ bigchaindb_version: "v2.0.0"
 bigchaindb_log_folder: "/var/log"
 
 # Nginx
-nginx_enable: false
+nginx_enable: true
+nginx_servername: "server.name"
+nginx_selfsigned: true
+nginx_copy_existing_certs: false
+# NOTE `nginx_selfsigned` and `nginx_copy_existing_certs` mutually exclusive!
 nginx_deb_package_name: "nginx"
 nginx_conf_loc: "/etc/nginx/nginx.conf"
 nginx_conf_net_loc: "https://raw.githubusercontent.com/bigchaindb/bigchaindb/{{ bigchaindb_version }}/nginx/nginx.conf"
-nginx_servername: "server.name"
-nginx_selfsigned: true
 
 # etc
 use_trusted_ntp: true
